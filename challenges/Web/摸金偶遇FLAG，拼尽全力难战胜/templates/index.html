@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>破译电脑挑战</title>
+</head>
+
+<link rel="stylesheet" type="text/css" href="./static/style.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/layui/dist/css/layui.css">
+
+<script src="https://cdn.jsdelivr.net/npm/layui/dist/layui.js"></script>
+
+<body>
+    <blockquote class="layui-elem-quote">
+        <p><b>破译电脑挑战</b></p>
+        <p>在指定时间内破译完全部的密码获取 FLAG</p>
+        <p>该小游戏原型来自水印所示攻略站，创意及大部分代码由</p>
+        <p>
+            <a href="https://space.bilibili.com/12060394" target="_blank" style="color: #2196f3;">猫宫niyu</a>
+            和
+            <a href="https://space.bilibili.com/506332398" target="_blank" style="color: #2196f3;">屁屁桃是狗托</a>
+            联合提供，已获得授权
+        </p>
+    </blockquote>
+
+    <div class="layui-panel">
+        <div
+            id="decipherComputerChallengeForm"
+            class="layui-form"
+            style="margin-top: 15px; display: flex; flex-direction: column; align-items: center;"
+        >
+
+        <div class="layui-form-item" style="text-align: center;">
+            <button
+                id="decipherComputerChallengeStartBTN"
+                class="layui-btn"
+                lay-on="startDecipherComputerChallenge"
+            >
+                开始挑战
+            </button>
+            <button
+                id="decipherComputerChallengeStopBTN"
+                class="layui-btn layui-btn-disabled"
+                lay-on="stopDecipherComputerChallenge"
+            >
+                停止挑战
+            </button>
+        </div>
+    </div>
+    <hr />
+    <div id="computerGUIContainer" class="computerGUIArea"></div>
+</div>
+
+    <script>
+        layui.use(["element", "form", "util", "slider"], function () {
+            var $ = layui.$;
+            var form = layui.form;
+            var element = layui.element;
+            var util = layui.util;
+            var slider = layui.slider;
+
+            const computerGUIContainer = $("#computerGUIContainer");
+            var hasRenderedContainer = false;
+
+            var canClick = false;
+            var realCode = [];
+            var guessCode = [];
+            var currentIndex = 0;
+            var rightCode = null;
+            var rightIndex = null;
+            var progress = 0;
+            var isHard = false;
+            var timerInterval = null;
+            var passedTime = 0;
+            var inputTimerInterval = null;
+
+            const lootMapLists = [
+                {
+                    id: "15070050001",
+                    name: "FLAG",
+                    grade: 6,
+                }
+            ];
+
+            var morseCodeLength = 9;
+            var limitChallenge = true;
+            var limitChallengeTime = 3;
+            var myToken = "";
+
+            util.on("lay-on", {
+                startDecipherComputerChallenge: function (othis) {
+                    if (othis.hasClass("layui-btn-disabled")) {
+                        return false;
+                    }
+
+                    canClick = false;
+                    resetContainer(); // resetContainer 现在会异步更新界面
+                    scaleContent();
+
+                    if (limitChallenge) {
+                        updateProgressBar(1);
+                        startCountdown();
+                    }
+
+                    $(".decode-item-block").hide();
+                    $(".leftPanel,.inputPanel").show();
+
+                    othis.addClass("layui-btn-disabled");
+                    $("#decipherComputerChallengeStopBTN").removeClass(
+                        "layui-btn-disabled"
+                    );
+
+                    setTimeout(function () {
+                        window.scrollTo({
+                            top: document.documentElement.scrollHeight,
+                            behavior: "smooth",
+                        });
+                    }, 0);
+
+                    canClick = true;
+                },
+                stopDecipherComputerChallenge: function (othis) {
+                    if (othis.hasClass("layui-btn-disabled")) {
+                        return false;
+                    }
+
+                    canClick = false;
+                    if (timerInterval) clearInterval(timerInterval);
+                    updateProgressBar(4);
+
+                    othis.addClass("layui-btn-disabled");
+                    $("#decipherComputerChallengeStartBTN").removeClass(
+                        "layui-btn-disabled"
+                    );
+                },
+            });
+
+            form.render();
+            element.render();
+
+            function generateRandomDigitArray(length) {
+                return new Promise((resolve, reject) => {
+                    fetch(`/get_challenge?count=${length}`)
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            if (data.error) {
+                                reject(data.error);
+                            } else {
+                                const real = data.numbers;
+                                const guess = Array.from({ length }, () => null);
+                                myToken = data.token; // 保存 token 到 myToken
+                                resolve({ real, guess });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching challenge data:", error);
+                            reject("Failed to fetch challenge data.");
+                        });
+                });
+            }
+
+            function renderContainer() {
+                if (hasRenderedContainer) return;
+
+                const computerGUIContainer = $("#computerGUIContainer");
+                computerGUIContainer.html(`
+            <div id="scaledWrapper" class="computerContainerWrapper">
+                <div class='computerContainer'>
+                    <div class='computerTitle'>请找到摩斯密码对应的数字</div>
+                    <div class='computerClueContent'>
+                        <div class='leftPanel' id="leftPanel"></div>
+                        <div class="inputPanel">
+                            <div class="inputTitle">请输入密码_ _ _</div>
+                            <div class="inputContent" id="inputContent"></div>
+                        </div>
+                        <div class="decode-item-block">
+                            <img class="decode-item-img" src="./image/default.webp?t=1729416942" alt="奖励物品">
+                            <div class="decode-item-name"></div>
+                        </div>
+                    </div>
+                    <div id="computerProgressContainer"></div>
+                </div>
+            </div>
+        `);
+
+                $(".decode-item-block").hide();
+                hasRenderedContainer = true;
+                bindEvents();
+                scaleContent();
+
+                // 初始渲染内容
+                updateLeftPanel();
+                updateInputContent();
+                if (limitChallenge) {
+                    updateProgressBar(0);
+                }
+            }
+
+            function renderInputShow() {
+                if (!guessCode || !Array.isArray(guessCode)) {
+                    return `
+                <div class='inputContentShow'>
+                    <div class='inputContentShowItem'>
+                        <div class='inputContentShowItemInner'>加载中...</div>
+                    </div>
+                </div>
+            `;
+                }
+                
+                return `
+            <div class='inputContentShow'>
+            ${guessCode
+                .map(
+                    (item, index) => `
+                <div class='inputContentShowItem ${
+                    index === currentIndex ? "active" : ""
+                } ${
+                        rightIndex === index ? "right" : ""
+                    } 'style='flex-basis: ${isHard ? "9%" : "30%"}'>
+                    <div class='inputContentShowItemInner'>${
+                        item ?? ""
+                    }</div>
+                </div>
+            `
+                )
+                .join("")}
+            </div>
+        `;
+            }
+
+            function renderInputBtn() {
+                const keys = [
+                    "7",
+                    "8",
+                    "9",
+                    "4",
+                    "5",
+                    "6",
+                    "1",
+                    "2",
+                    "3",
+                    null,
+                    "0",
+                    null,
+                ];
+                return `
+            <div class="inputContentBtnArea">
+            ${keys
+                .map(
+                    (item) => `
+                <div class="inputContentBtnAreaItem ${
+                    item === null ? "empty" : ""
+                }" data-value="${item !== null ? item : ""}">
+                    ${item !== null ? item : ""}
+                </div>
+            `
+                )
+                .join("")}
+            </div>
+        `;
+            }
+
+            function bindEvents() {
+                const container = document.querySelector(
+                    ".inputContentBtnArea"
+                );
+                if (!container) return;
+
+                container.replaceWith(container.cloneNode(true));
+
+                const newContainer = document.querySelector(
+                    ".inputContentBtnArea"
+                );
+
+                newContainer.addEventListener("click", (e) => {
+                    const btn = e.target.closest(
+                        ".inputContentBtnAreaItem"
+                    );
+                    if (btn && !btn.classList.contains("empty")) {
+                        const val = btn.getAttribute("data-value");
+                        if (val !== "") {
+                            clickBtn(val);
+                        }
+                    }
+                });
+            }
+
+            function isRightCode(num) {
+                return String(realCode[currentIndex]) === String(num);
+            }
+
+            function clickBtn(num) {
+                if (
+                    !canClick ||
+                    currentIndex >= morseCodeLength
+                )
+                    return;
+
+                canClick = false;
+                guessCode[currentIndex] = num;
+
+                var isRight = isRightCode(num);
+                if (isRight) {
+                    if (inputTimerInterval) {
+                        clearTimeout(inputTimerInterval);
+                        inputTimerInterval = null;
+                    }
+                    rightCode = num;
+                    rightIndex = currentIndex;
+                    currentIndex++;
+                    canClick = true;
+                }
+
+                updateLeftPanel();
+                updateInputContent();
+                if (limitChallenge) {
+                    updateProgressBar(1);
+                }
+
+                if (isRight) {
+                    if (
+                        currentIndex === morseCodeLength
+                    ) {
+                        if (timerInterval) clearInterval(timerInterval);
+                        $("#decipherComputerChallengeStopBTN").addClass(
+                            "layui-btn-disabled"
+                        );
+
+                        canClick = false;
+                        progress = 0;
+                        const duration = 1000;
+                        const steps = 60;
+                        const interval = duration / steps;
+                        const increment = 100 / steps;
+
+                        var hasRendered = false;
+
+                        const progressInterval = setInterval(() => {
+                            progress += increment;
+
+                            if (!hasRendered && progress > 80) {
+                                const randomLootId = Math.floor(
+                                    Math.random() * lootMapLists.length
+                                );
+                                const lootData = lootMapLists[randomLootId];
+                                const isDarkMode =
+                                    document.documentElement.classList.contains(
+                                        "dark"
+                                    );
+
+                                var overlayColor = isDarkMode
+                                    ? `var(--gd${lootData.grade}d)`
+                                    : `var(--gd${lootData.grade})`;
+                                var imgUrl = `https://playerhub.df.qq.com/playerhub/60004/object/${lootData.id}.png`;
+
+                                $(
+                                    ".decode-item-block .decode-item-img"
+                                ).attr("src", imgUrl);
+                                $(
+                                    ".decode-item-block .decode-item-img"
+                                ).css("background-color", overlayColor);
+                                $(
+                                    ".decode-item-block .decode-item-name"
+                                ).text(lootData.name);
+
+                                rightCode = null;
+                                rightIndex = null;
+
+                                hasRendered = true;
+                                //renderContainer();
+                                updateLeftPanel();
+                                updateInputContent();
+                                if (limitChallenge) {
+                                    updateProgressBar(1);
+                                }
+                            }
+
+                            if (progress >= 100) {
+                                progress = 100;
+                                clearInterval(progressInterval);
+                                updateProgressBar(5);
+                                requestAnimationFrame(() => {
+                                    requestAnimationFrame(() => {
+                                        $(
+                                            "#decipherComputerChallengeStartBTN"
+                                        ).removeClass("layui-btn-disabled");
+                                    });
+                                });
+                                return;
+                            }
+                            updateProgressBar(2);
+                        }, interval);
+
+                        //renderContainer();
+                        updateLeftPanel();
+                        updateInputContent();
+                        if (limitChallenge) {
+                            updateProgressBar(1);
+                        }
+                    } else {
+                        inputTimerInterval = setTimeout(() => {
+                            rightCode = null;
+                            rightIndex = null;
+                            //renderContainer();
+                            updateLeftPanel();
+                            updateInputContent();
+                            if (limitChallenge) {
+                                updateProgressBar(1);
+                            }
+                        }, 800);
+                    }
+                } else {
+                    inputTimerInterval = setTimeout(() => {
+                        guessCode[currentIndex] = null;
+                        canClick = true;
+                        //renderContainer();
+                        updateLeftPanel();
+                        updateInputContent();
+                        if (limitChallenge) {
+                            updateProgressBar(1);
+                        }
+                    }, 800);
+                }
+            }
+
+            function resetContainer() {
+                currentIndex = 0;
+                rightCode = null;
+                rightIndex = null;
+                progress = 0;
+                clearInterval(timerInterval);
+                $(".computerTitle").text("请找到摩斯密码对应的数字");
+                
+                generateRandomDigitArray(morseCodeLength)
+                    .then(({ real, guess }) => {
+                        realCode = real;
+                        guessCode = guess;
+                        updateLeftPanel();
+                        updateInputContent();
+                        if (limitChallenge) {
+                            updateProgressBar(1);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("重置容器失败:", error);
+                        layer.msg("获取新题目失败，请重试");
+                    });
+            }
+
+            function startCountdown() {
+                var timeLeft = limitChallengeTime;
+                var totalTime = timeLeft;
+                progress = 0;
+                passedTime = 0;
+
+                timerInterval = setInterval(() => {
+                    timeLeft -= 0.1;
+                    passedTime += 0.1;
+                    progress += (100 / totalTime) * 0.1;
+
+                    timeLeft = Math.max(0, parseFloat(timeLeft.toFixed(1)));
+                    passedTime = parseFloat(passedTime.toFixed(1));
+                    progress = Math.min(
+                        100,
+                        parseFloat(progress.toFixed(1))
+                    );
+
+                    if (timeLeft <= 0) {
+                        progress = 100;
+                        clearInterval(timerInterval);
+                        if (inputTimerInterval) {
+                            clearTimeout(inputTimerInterval);
+                            inputTimerInterval = null;
+                        }
+                        canClick = false;
+                        updateProgressBar(3);
+                        $("#decipherComputerChallengeStopBTN").addClass(
+                            "layui-btn-disabled"
+                        );
+                        $("#decipherComputerChallengeStartBTN").removeClass(
+                            "layui-btn-disabled"
+                        );
+                    } else {
+                        //renderContainer();
+                        updateProgressBar((style = 1));
+                    }
+                }, 100);
+            }
+
+            function renderCodeMap() {
+                const codeMapList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+                
+                const safeGuessCode = guessCode || [];
+                
+                return `
+            <div class='codeMap'>
+                <div class='codeMapTitle'>>> 密码破译线索</div>
+                <div class='codeMapContent'>
+                    ${codeMapList
+                        .map(
+                            (item) => `
+                        <div class='codeMapContentItem ${
+                            safeGuessCode.includes(String(item)) ? "choose" : ""
+                        } ${rightCode == item ? "right" : ""}'>
+                            <div class='morseCode'>${renderMorseCode(
+                                item
+                            )}</div>
+                            <div class='codeMapContentItemNum'>${item}</div>
+                        </div>
+                    `
+                        )
+                        .join("")}
+                </div>
+            </div>
+        `;
+            }
+
+            function renderCodeShow() {
+                if (!realCode || !Array.isArray(realCode)) {
+                    return `
+                <div class='codeShow'>
+                    <div class='codeTitle'>>> 已获取的密码_ _ _</div>
+                    <div class='codeContent'>
+                        <div class='codeContentItem'>加载中...</div>
+                    </div>
+                </div>
+            `;
+                }
+                
+                return `
+            <div class='codeShow'>
+                <div class='codeTitle'>>> 已获取的密码_ _ _</div>
+                <div class='codeContent'>
+                    ${realCode
+                        .map(
+                            (item, index) => `
+                        <div class='${
+                            index === currentIndex
+                                ? "chooseCodeContentItem"
+                                : "codeContentItem"
+                        }'>
+                            <div class='morseCode'>${renderMorseCode(
+                                item
+                            )}</div>
+                        </div>
+                    `
+                        )
+                        .join("")}
+                </div>
+            </div>
+        `;
+            }
+
+            function getProgressBarText(style) {
+                switch (style) {
+                    case 0:
+                        return ">>> 等待开始挑战...";
+                    case 1:
+                        return ">>> 防破译进程加载中...";
+                    case 2:
+                        return ">>> 正在骇入系统...";
+                    case 3:
+                        return ">>> 挑战超时";
+                    case 4:
+                        return `>>> 挑战已终止，正确密码 ${realCode.join("")}`;
+                    default:
+                        fetch("/verify", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                answers: realCode,
+                                token: myToken
+                            })
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.correct) {
+                                    const flag = data.flag || "无法获取flag";
+                                    $(".computerTitle").text(`破译完成，已获取如下权限: ${flag}`);
+                                } else {
+                                    $(".computerTitle").text(`破译失败: ${data.message || "未知错误"}`);
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error verifying solution:", error);
+                                $(".computerTitle").text("破译完成，但无法获取权限内容");
+                            });
+                        $(".decode-item-block").show();
+                        $(".leftPanel,.inputPanel").hide();
+                        return (
+                            ">>> 骇入成功" +
+                            (limitChallenge ? `，挑战用时：${passedTime} 秒` : "")
+                        );
+                }
+            }
+
+            function renderProgressBar(style = 1) {
+                const percentTitleLeftText = getProgressBarText(style);
+                return `
+            <div class='computerProgress'>
+                <div class='percentTitle'>
+                    <div id='percentTitleLeft' class='percentTitleLeft'>${percentTitleLeftText}</div>
+                    <div id='percentTitleRight' class='percentTitleRight'>${progress.toFixed(
+                        1
+                    )}%</div>
+                </div>
+                <div class='percentContent'>
+                    <div class='percentContentOuter'>
+                        <div id='progressBar' class='progressBar' style='width: ${progress}%;'></div>
+                    </div>
+                </div>
+            </div>
+        `;
+            }
+
+            function renderMorseCode(num) {
+                const dash = '<div class="morseCodeDash">━</div>';
+                const dot = '<div class="morseCodeDot">·</div>';
+                const map = {
+                    1: [dot, dash, dash, dash, dash],
+                    2: [dot, dot, dash, dash, dash],
+                    3: [dot, dot, dot, dash, dash],
+                    4: [dot, dot, dot, dot, dash],
+                    5: [dot, dot, dot, dot, dot],
+                    6: [dash, dot, dot, dot, dot],
+                    7: [dash, dash, dot, dot, dot],
+                    8: [dash, dash, dash, dot, dot],
+                    9: [dash, dash, dash, dash, dot],
+                    0: [dash, dash, dash, dash, dash],
+                };
+                return map[num].join("");
+            }
+
+            function updateLeftPanel() {
+                const content = `
+            ${renderCodeShow()}
+            ${!isHard ? renderCodeMap() : ""}
+        `;
+                $("#leftPanel").html(content);
+            }
+
+            function updateInputContent() {
+                const content = `
+            ${!isHard ? renderInputShow() : ""}
+            ${renderInputBtn()}
+        `;
+                $("#inputContent").html(content);
+                bindEvents();
+            }
+
+            function updateProgressBar(style = 1) {
+                $("#computerProgressContainer").html(
+                    renderProgressBar(style)
+                );
+            }
+
+            function scaleContent() {
+                const container = $("#computerGUIContainer");
+                const wrapper = $("#scaledWrapper");
+
+                if (container == null) return;
+                if (wrapper == null) return;
+
+                const containerRect = container[0].getBoundingClientRect();
+                const wrapperRect = container[0].getBoundingClientRect();
+                var scale, transformStyle;
+
+                if (window.innerWidth < 768) {
+                    const scaleX = containerRect.height / 992;
+                    const scaleY = containerRect.width / 624;
+                    scale = Math.min(scaleX, scaleY, 1);
+                    transformStyle = `rotate(90deg) scale(${
+                        scale -
+                        (morseCodeLength > 3
+                            ? 0.15
+                            : 0.11)
+                    })`;
+                } else {
+                    const scaleX = containerRect.width / 992;
+                    const scaleY = containerRect.height / 624;
+                    scale = Math.min(scaleX, scaleY, 1);
+                    transformStyle = `scale(${scale - 0.11})`;
+                }
+
+                wrapper[0].style.transform = transformStyle;
+            }
+
+            generateRandomDigitArray(morseCodeLength)
+                .then(({ real, guess }) => {
+                    realCode = real;
+                    guessCode = guess;
+                    renderContainer();
+
+                    if (limitChallenge) {
+                        updateProgressBar(0);
+                    }
+                })
+                .catch((error) => {
+                    console.error("初始化失败:", error);
+                    layer.msg("初始化失败，请刷新页面重试");
+                });
+
+            function handleInput(num) {
+                if (!canClick) return;
+                if (isNaN(num)) return;
+                clickBtn(num);
+            }
+
+            function handleMessage(event) {
+                if (event.data === "resizeTable") {
+                    scaleContent();
+                }
+            }
+
+            $(window).on("resize", function () {
+                scaleContent();
+            });
+
+            window.addEventListener("message", handleMessage);
+
+            window.onPageUnload = function () {
+                window.removeEventListener("message", handleMessage);
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+.computerGUIArea * {
+    box-sizing: border-box;
+}
+
+.computerGUIArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.computerContainerWrapper {
+    transform-origin: center;
+    width: fit-content;
+    height: fit-content;
+}
+
+.computerContainer {
+    caret-color: transparent;
+    width: 1108px;
+    border-radius: 4px;
+    border: 2px solid white;
+    color: white;
+    padding: 24px;
+    aspect-ratio: 1108 / 738;
+    background-image: url("./images/minigame_computer.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.computerTitle {
+    margin-top: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px 16px;
+    width: 100%;
+}
+
+.computerClueContent {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.leftPanel {
+    flex: 1 1 70%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.6);
+}
+
+.codeMap {
+    padding: 18px 8px;
+}
+
+.codeMap .codeMapTitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.codeMap .codeMapContent {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    row-gap: 8px;
+    column-gap: 8px;
+}
+
+.codeMap .codeMapContent .codeMapContentItem {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    padding: 3px 24px;
+    flex: 1 1 48%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid transparent;
+}
+
+.codeMap .codeMapContent .codeMapContentItem.choose {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.codeMap .codeMapContent .codeMapContentItem.right {
+    animation: borderGradientAnimation 0.8s ease forwards;
+    border-image: linear-gradient(170deg, transparent 0%, rgba(255, 255, 255, 1) 50%, transparent 100%);
+    border-image-slice: 1;
+}
+
+.codeMap .codeMapContent .codeMapContentItem .codeMapContentItemNum {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 28px;
+}
+
+.codeShow {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.codeShow .codeTitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.codeShow .codeContent {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    height: 50px;
+    column-gap: 12px;
+    row-gap: 8px;
+}
+
+.codeShow .codeContent .codeContentItem {
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    margin: 18px 0;
+    flex: 0 1 32%;
+    height: 50px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.codeShow .codeContent .chooseCodeContentItem {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    margin: 18px 0;
+    flex: 0 1 32%;
+    height: 50px;
+    position: relative;
+}
+
+.codeShow .codeContent .chooseCodeContentItem::after,
+.codeShow .codeContent .chooseCodeContentItem::before {
+    width: 6px;
+    height: 100%;
+    position: absolute;
+    top: -2px;
+    content: '';
+    border: 2px solid white;
+}
+
+.codeShow .codeContent .chooseCodeContentItem::after {
+    border-left: none;
+    right: 0;
+}
+
+.codeShow .codeContent .chooseCodeContentItem::before {
+    border-right: none;
+    left: 0;
+}
+
+.codeShow .codeContent .outer {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 1px 0 0 0;
+    width: 100%;
+    height: 100%;
+}
+
+.morseCodeDot {
+    font-size: 32px;
+    width: 28px;
+}
+
+.morseCodeDash {
+    transform: scaleX(0.7);
+    font-size: 28px;
+    padding: 0 2px;
+    width: 28px;
+}
+
+.morseCode {
+    font-family: monospace;
+    font-size: 22px;
+    padding: 0 20px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.morseCode {
+    flex: 1;
+}
+
+.guessBorder {
+    width: 4px;
+    border: 2px solid white;
+    content: '';
+    height: 100%;
+    position: absolute;
+    top: -2px;
+}
+
+.inputPanel {
+    flex: 1 1 30%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.inputPanel .inputTitle {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 18px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.inputPanel .inputContent {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 24px 24px 4px;
+}
+
+.inputPanel .inputContent .inputContentShow {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 4px;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 36px;
+    color: #13fc95;
+    flex-basis: 30%;
+    background-color: #192832;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    aspect-ratio: 1 / 1;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem.right {
+    background-color: #192832;
+    border-image: linear-gradient(135deg, transparent 0%, transparent 50%, transparent 100%);
+    border-image-slice: 1;
+    animation: borderInputGradientAnimation 0.8s ease forwards;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem.right .inputContentShowItemInner {
+    background-color: rgba(19, 252, 149, 0.2);
+    animation: backGradientAnimation 0.8s ease forwards;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem.active {
+    position: relative;
+    color: #f43334;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem.active::before {
+    width: 4px;
+    border: 2px solid white;
+    content: '';
+    height: 100%;
+    position: absolute;
+    top: -2px;
+    border-right: none;
+    left: 0;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem.active::after {
+    width: 4px;
+    border: 2px solid white;
+    content: '';
+    height: 100%;
+    position: absolute;
+    top: -2px;
+    border-left: none;
+    right: 0;
+}
+
+.inputPanel .inputContent .inputContentShow .inputContentShowItem .inputContentShowItemInner {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 95%;
+}
+
+.inputContentBtnArea {
+    margin-top: 40px;
+    display: flex;
+    padding: 4px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    row-gap: 6px;
+    column-gap: 10px;
+    background-image: url("./images/delta.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.inputContentBtnArea .inputContentBtnAreaItem {
+    flex: 1 1 30%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+.inputContentBtnArea .inputContentBtnAreaItem:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.inputContentBtnArea .inputContentBtnAreaItem.empty {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 0;
+    cursor: default;
+}
+
+#computerProgressContainer {
+    min-height: 76.8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.computerProgress {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 8px;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.computerProgress .percentTitle {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.computerProgress .percentContent {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2px;
+    height: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.computerProgress .percentContent .percentContentOuter {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-clip: padding-box;
+    overflow: hidden;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+    background-size: 20px;
+}
+
+.computerProgress .percentContent .percentContentOuter .progressBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4) 25%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent);
+    background-size: 20px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+@keyframes borderInputGradientAnimation {
+    0% {
+        border-image: linear-gradient(135deg, transparent 0%, white 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+
+    15% {
+        border-image: linear-gradient(135deg, transparent 0%, white 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+
+    30% {
+        border-image: linear-gradient(135deg, white 0%, white 50%, white 100%);
+        border-image-slice: 1;
+    }
+
+    90% {
+        border-image: linear-gradient(135deg, white 0%, white 50%, white 100%);
+        border-image-slice: 1;
+    }
+
+    100% {
+        border-image: linear-gradient(135deg, transparent 0%, transparent 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+}
+
+@keyframes backGradientAnimation {
+    0% {
+        background-color: #192832;
+    }
+
+    15% {
+        background-color: rgba(19, 252, 149, 0.2);
+    }
+
+    30% {
+        background-color: rgba(19, 252, 149, 0.4);
+    }
+
+    45% {
+        background-color: rgba(19, 252, 149, 0.6);
+    }
+
+    70% {
+        background-color: rgba(19, 252, 149, 0.6);
+    }
+
+    100% {
+        background-color: #192832;
+    }
+}
+
+@keyframes borderGradientAnimation {
+    0% {
+        border-image: linear-gradient(170deg, transparent 0%, transparent 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+
+    15% {
+        border-image: linear-gradient(170deg, transparent 0%, white 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+
+    30% {
+        border-image: linear-gradient(170deg, white 0%, white 50%, white 100%);
+        border-image-slice: 1;
+    }
+
+    70% {
+        border-image: linear-gradient(170deg, white 0%, white 50%, white 100%);
+        border-image-slice: 1;
+    }
+
+    100% {
+        border-image: linear-gradient(170deg, transparent 0%, transparent 50%, transparent 100%);
+        border-image-slice: 1;
+    }
+}
+
+#decipherComputerChallengeForm .layui-input-inline {
+    width: 100px !important;
+}
+.decode-item-block {
+    width: 240px;
+    height: 514px;
+    margin: 0 auto;
+    margin-top: 20px;
+    background: rgba(36, 54, 64, 0.18);
+    border: 1.5px solid #3c4d58;
+    border-radius: 7px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.decode-item-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    background: #1b2836;
+    border-radius: 5px;
+    border: 1px solid #2d3845;
+    margin-bottom: 90px;
+    box-shadow: 0 2px 8px #1b283633;
+}
+.decode-item-name {
+    font-size: 16px;
+    text-align: center;
+    margin-top: 0px;
+    background: rgba(40, 56, 68, 0.50);
+    border-radius: 3px;
+    width: 100%;
+    padding: 22px 0 22px 0;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+}

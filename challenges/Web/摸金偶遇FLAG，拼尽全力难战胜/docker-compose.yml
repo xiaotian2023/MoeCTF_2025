@@ -1,0 +1,10 @@
+version: '3'
+name: test
+services:
+  web:
+    build: .
+    environment:
+      - FLAG=moectf{env_test}
+      # 平台启动不依赖 docker-compose，不填也行
+    ports:
+      - "8099:80"
