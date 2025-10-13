@@ -33,6 +33,27 @@ bp抓包修改，使用GET方法和POST方法分别传输即可。
 ## 04 第四章 金曦破禁与七绝傀儡阵
 考察对于`get`，`post`，`put`方法，`xff`，`Referer`，`user-agent`，`cookie`的使用。
 
+![alt text](attachment/image-4.png)
+![alt text](attachment/image-5.png)
+bW9lY3Rme0Mw
+![alt text](attachment/image-6.png)
+![alt text](attachment/image-7.png)
+bjZyNDd1MTQ3
+![alt text](attachment/image-8.png)
+![alt text](attachment/image-9.png)
+MTBuNV95MHVy
+![alt text](attachment/image-10.png)
+![alt text](attachment/image-11.png)
+X2g3N1BfbDN2
+![alt text](attachment/image-12.png)
+![alt text](attachment/image-13.png)
+M2xfMTVfcjM0
+![alt text](attachment/image-14.png)
+![alt text](attachment/image-15.png)
+bGx5X2gxOWgh
+![alt text](attachment/image-16.png)
+![alt text](attachment/image-17.png)
+fQ==
 
 ## 05 第五章 打上门来！
 简单的目录穿越
