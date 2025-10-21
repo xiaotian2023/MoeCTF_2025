@@ -1,0 +1,13 @@
+DROP DATABASE IF EXISTS ctftraining;
+DROP DATABASE IF EXISTS test;
+CREATE DATABASE user;
+USE user;
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+    username VARCHAR(50),
+    password VARCHAR(50)
+);
+
+INSERT INTO users VALUES ('admin', 'a1545de57b740fcbed419823cb38b800db46f905');
+
