@@ -1,0 +1,48 @@
+body {
+    width: 50%;
+    max-width: 800px;
+    min-width: 480px;
+    margin: 0 auto;
+    font-family: sans-serif;
+    background: #f7f7f7;
+}
+h1 {
+    color: #b8860b;
+    text-align: center;
+}
+.form {
+    margin: 30px 0;
+    text-align: center;
+}
+input[type="number"] {
+    width: 200px;
+    padding: 6px;
+    font-size: 1.1em;
+}
+button {
+    padding: 6px 18px;
+    font-size: 1.1em;
+    background: #b8860b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.resultParas {
+    text-align: center;
+    margin-top: 20px;
+}
+.lastResult {
+    color: #fff;
+    background: #b8860b;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+.flagResult {
+    color: #2a9d8f;
+    font-weight: bold;
+    font-size: 1.2em;
+}

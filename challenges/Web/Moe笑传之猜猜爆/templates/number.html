@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>猜数字游戏</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h1>猜数字游戏</h1>
+    <p>我刚才随机选定了一个10000以内的自然数。你有多达 <b>1</b> 次的机会猜中它！我会告诉你猜的高了还是低了...（这好像没有用？对吗？哈哈哈哈）</p>
+    <div class="form">
+      <label for="guessField">请猜数：</label>
+      <input type="number" id="guessField" class="guessField" min="1" max="10000">
+      <button id="guessBtn">我猜</button>
+    </div>
+    <div class="resultParas">
+      <p class="guesses"></p>
+      <p class="lastResult"></p>
+      <p class="lowOrHi"></p>
+      <p class="flagResult"></p>
+    </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  </body>
+</html>

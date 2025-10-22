@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  star-challenge:
+    build: .
+    container_name: star-challenge
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web/uploads:/var/www/html/uploads
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+      - FLAG=CTF{Ht4cc3ss_R3wr1t3}
+    restart: unless-stopped

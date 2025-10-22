@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>耄耋的指导教室</title>
+    <style>
+        body {
+            font-family: "微软雅黑", Arial, sans-serif;
+            background: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        .top-buttons {
+            width: 700px;
+            max-width: 95vw;
+            margin: 40px auto 0 auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 18px;
+            position: relative;
+        }
+        .main-btn {
+            padding: 12px 32px;
+            font-size: 1.08rem;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: background 0.2s;
+        }
+        .main-btn.flag {
+            background-image: linear-gradient(135deg,rgba(255,0,0,1),rgba(168,0,0,1.0));
+            box-shadow: 
+                2px 2px 5px rgba(0,0,0,0.5),
+                inset 2px 2px 5px rgba(0,0,0,0.7),
+                inset -2px -2px 5px rgba(255,255,255,0.7);
+            color: #fff;
+            border: none;
+        }
+        .main-btn.setting,
+        .submit-btn {
+            background-image: linear-gradient(135deg, #2ec4b6 0%, #11998e 100%);
+            box-shadow:
+                2px 2px 5px rgba(0,0,0,0.5),
+                inset -2px -2px 5px rgba(0,0,0,0.7),
+                inset 2px 2px 5px rgba(255,255,255,0.7);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .submit-btn {
+            background-image: linear-gradient(135deg, #444 0%, #222 100%);
+        }
+        .main-btn.setting:hover,
+        .submit-btn:hover {
+            filter: brightness(1.08);
+            box-shadow:
+                4px 4px 12px rgba(0,0,0,0.32),
+                0 -3px 12px 0 rgba(255,255,255,0.32);
+        }
+        /* 设置菜单样式 */
+        .setting-menu {
+            display: none;
+            position: absolute;
+            top: 54px;
+            right: 0;
+            background: #fff;
+            border: 1.5px solid #bbb;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px #e0e0e0;
+            min-width: 180px;
+            z-index: 10;
+        }
+        .setting-menu.active {
+            display: block;
+        }
+        .setting-menu button {
+            width: 100%;
+            padding: 12px 0;
+            background: none;
+            border: none;
+            border-bottom: 1px solid #eee;
+            font-size: 1.05rem;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .setting-menu button:last-child {
+            border-bottom: none;
+        }
+        .setting-menu button:hover {
+            background: #f3f3f3;
+        }
+        /* 让表单和按钮与对话框同宽 */
+        #loginForm {
+            width: 700px;
+            max-width: 95vw;
+            margin: 32px auto 0 auto;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.08rem;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1.08rem;
+            border: 1.5px solid #bbb;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 18px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px 0;
+            font-size: 1.18rem;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover {
+            background: #444;
+        }
+        .dialog-box {
+            margin: 40px auto 0 auto;
+            width: 700px;
+            max-width: 95vw;
+            min-height: 260px;
+            background: #f3f3f3;
+            border-radius: 8px;
+            border: 2px solid #bbb;
+            font-size: 1.22rem;
+            color: #333;
+            padding: 28px 20px;
+            box-sizing: border-box;
+            line-height: 2;
+            transition: background 0.3s, color 0.3s;
+            position: relative;
+        }
+        /* 夜间模式 */
+        body.night {
+            background: #23272e;
+            color: #e0e0e0;
+        }
+        body.night .dialog-box {
+            background: #2d323a;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+        body.night input, body.night label {
+            color: #e0e0e0;
+            background: #23272e;
+        }
+        body.night input {
+            border-color: #444;
+        }
+        /* 镜像翻转 */
+        body.mirror {
+            transform: scaleX(-1);
+        }
+        body.mirror * {
+            direction: rtl;
+        }
+        .dialog-action-btn {
+            width: 110px;
+            padding: 10px 0;
+            font-size: 1.05rem;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #e0e0e0;
+            transition: background 0.2s;
+            text-align: center;
+        }
+        .dialog-action-btn:hover {
+            background: #444;
+        }
+        body.mirror .main-btn.setting,
+        body.mirror .submit-btn {
+            box-shadow:
+                2px 2px 5px rgba(0,0,0,0.5),
+                inset 2px 2px 5px rgba(0,0,0,0.7),
+                inset -2px -2px 5px rgba(255,255,255,0.7);
+        }
+
+        body.mirror .main-btn.flag {
+            box-shadow:
+                2px 2px 5px rgba(0,0,0,0.5),
+                inset -2px -2px 5px rgba(0,0,0,0.7),
+                inset 2px 2px 5px rgba(255,255,255,0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部功能按钮 -->
+    <div class="top-buttons">
+        <button type="button" class="main-btn flag">flag</button>
+        <button type="button" class="main-btn setting" id="settingBtn">设置</button>
+        <div class="setting-menu" id="settingMenu">
+            <button type="button" id="toggleNight">白天/黑夜模式</button>
+            <button type="button" id="closePage">千万不要点</button>
+            <button type="button" id="mirrorPage">左右镜像翻转</button>
+        </div>
+    </div>
+    <!-- 登录表单 -->
+    <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+            <label for="username">账号：</label>
+            <input type="text" id="username" name="username" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="password">密码：</label>
+            <input type="password" id="password" name="password" required autocomplete="off">
+        </div>
+        <button type="submit" class="submit-btn">提交</button>
+    </form>
+    <!-- 对话框 -->
+    <div class="dialog-box" id="dialogBox" style="position:relative;">
+        <span id="dialogText"></span>
+        <button id="feedBtn" class="dialog-action-btn" style="display:none; position:absolute; right:24px; bottom:110px;">投喂</button>
+        <button id="findPwdBtn" class="dialog-action-btn" style="display:none; position:absolute; right:148px; bottom:24px;">找回密码</button>
+        <button id="nextBtn" class="dialog-action-btn" style="display:none; position:absolute; right:24px; bottom:24px;">下一句</button>
+    </div>
+    <!-- 找回密码弹窗 -->
+<div id="findPwdModal" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:8px; box-shadow:0 2px 16px #888; padding:24px; z-index:9999;">
+    <div style="margin-bottom:10px;">请输入找回密钥：</div>
+    <input type="text" id="findPwdInput" style="width:220px; padding:6px;">
+    <button id="findPwdSubmit" style="margin-left:12px;">提交</button>
+    <button id="findPwdCancel" style="margin-left:8px;">取消</button>
+</div>
+    <img id="catImg" src="{{ url_for('static', filename='cat1.jpg') }}" 
+     style="position:fixed; left:100px; top:100px; width:120px; z-index:9999; pointer-events:none; transition: left 1s, top 1s;">
+    <!-- 确保JS在body结尾处 -->
+    <script>
+        let isAdmin = false;
+
+        // 设置按钮弹出菜单
+        const settingBtn = document.getElementById('settingBtn');
+        const settingMenu = document.getElementById('settingMenu');
+
+        settingBtn.onclick = function(e) {
+            if (window.isAdmin) {
+                // 切换菜单显示
+                settingMenu.classList.toggle('active');
+                e.stopPropagation();
+            } else {
+                alert("你不是管理员");
+                e.stopPropagation();
+            }
+        };
+
+        // 点击菜单项时再请求后端
+        document.getElementById('toggleNight').onclick = function() {
+            document.body.classList.toggle('night');
+            settingMenu.classList.remove('active');
+        };
+        document.getElementById('closePage').onclick = function() {
+            window.open('','_self'); window.close();
+            settingMenu.classList.remove('active');
+        };
+        document.getElementById('mirrorPage').onclick = function() {
+            document.body.classList.toggle('mirror');
+            settingMenu.classList.remove('active');
+        };
+
+        // 随机游荡，移动间隔也随机
+        function randomMoveCat() {
+            const cat = document.getElementById('catImg');
+            const step = 250; // 每次最大移动距离（像素）
+            // 当前坐标
+            let curX = parseFloat(cat.style.left) || 100;
+            let curY = parseFloat(cat.style.top) || 100;
+            // 新坐标 = 当前坐标 ± step
+            let minX = Math.max(0, curX - step);
+            let maxX = Math.min(window.innerWidth - cat.width, curX + step);
+            let minY = Math.max(0, curY - step);
+            let maxY = Math.min(window.innerHeight - cat.height, curY + step);
+            let newX = minX + Math.random() * (maxX - minX);
+            let newY = minY + Math.random() * (maxY - minY);
+            cat.style.left = newX + 'px';
+            cat.style.top = newY + 'px';
+            // 随机下次移动时间（800ms~2200ms）
+            const nextTime = 800 + Math.random() * 1400;
+            setTimeout(randomMoveCat, nextTime);
+        }
+        // 启动
+        setTimeout(randomMoveCat, 1200);
+
+        // 切换表情包
+        function changeCat(src) {
+            document.getElementById('catImg').src = src;
+        }
+
+        let action = "next"; // 默认下一句
+
+        function loadDialog(act = "next") {
+            fetch('/dialog', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: act})
+            })
+            .then(res => res.json())
+            .then(data => {
+                updateDialog(data);
+            });
+        }
+
+        function updateDialog(data) {
+            if (data.html) {
+                document.getElementById('dialogText').innerHTML = data.text;
+            } else {
+                document.getElementById('dialogText').textContent = data.text;
+            }
+            document.getElementById('nextBtn').style.display = data.show_next ? 'block' : 'none';
+            document.getElementById('findPwdBtn').style.display = data.show_findpwd ? 'block' : 'none';
+            document.getElementById('feedBtn').style.display = data.show_feed ? 'block' : 'none';
+            window.isAdmin = !!data.is_admin; // 强制同步
+            // 隐藏密钥插入到页面底部
+            if (data.hidden_key) {
+                let keySpan = document.getElementById('hiddenKey');
+                if (!keySpan) {
+                    keySpan = document.createElement('span');
+                    keySpan.id = 'hiddenKey';
+                    keySpan.style.opacity = '0.05';
+                    keySpan.style.position = 'fixed';
+                    keySpan.style.bottom = '4px';
+                    keySpan.style.left = '4px';
+                    keySpan.style.userSelect = 'all';
+                    keySpan.style.pointerEvents = 'none';
+                    document.body.appendChild(keySpan);
+                }
+                keySpan.textContent = data.hidden_key;
+            }
+            // 判断是否需要弹出找回密码窗口
+            if (sessionStorage.getItem('dialog_step') == '15') {
+                document.getElementById('findPwdModal').style.display = 'block';
+            } else {
+                document.getElementById('findPwdModal').style.display = 'none';
+            }
+            // 假设后端返回当前step
+            sessionStorage.setItem('dialog_step', data.step || '');
+        } 
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDialog(); // 首次加载
+            document.getElementById('nextBtn').onclick = function() {
+                loadDialog("next");
+            };
+            document.getElementById('findPwdBtn').onclick = function() {
+                loadDialog("findpwd");
+            };
+            
+            // 修复flag按钮事件处理函数
+            document.querySelector('.main-btn.flag').onclick = function() {
+                // 判断是否镜像翻转
+                const isMirrored = document.body.classList.contains('mirror');
+                if (isMirrored) {
+                    fetch('/dialog', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'mirror_flag'})
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        // 只更新对话框，不弹窗
+                        document.getElementById('dialogText').textContent = data.text;
+                        document.getElementById('nextBtn').style.display = data.show_next ? 'block' : 'none';
+                        document.getElementById('findPwdBtn').style.display = data.show_findpwd ? 'block' : 'none';
+                        document.getElementById('feedBtn').style.display = data.show_feed ? 'block' : 'none';
+                    });
+                } else {
+                    // 原有flag按钮逻辑
+                    fetch('/dialog', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'flag'})
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.flag_popup) {
+                            alert("73");
+                        } else {
+                            alert("按钮已经损坏");
+                        }
+                        // 更新对话框内容和按钮状态
+                        document.getElementById('dialogText').textContent = data.text;
+                        document.getElementById('nextBtn').style.display = data.show_next ? 'block' : 'none';
+                        document.getElementById('findPwdBtn').style.display = data.show_findpwd ? 'block' : 'none';
+                        document.getElementById('feedBtn').style.display = data.show_feed ? 'block' : 'none';
+                    });
+                }
+            };
+            
+            document.getElementById('feedBtn').onclick = function() {
+                fetch('/dialog', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action: 'feed'})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('dialogText').textContent = data.text;
+                    document.getElementById('nextBtn').style.display = data.show_next ? 'block' : 'none';
+                    document.getElementById('findPwdBtn').style.display = data.show_findpwd ? 'block' : 'none';
+                    document.getElementById('feedBtn').style.display = data.show_feed ? 'block' : 'none';
+                    // 如果pending，2秒后自动请求pending_check
+                    if (data.pending) {
+                        setTimeout(function() {
+                            fetch('/dialog', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({action: 'pending_check'})
+                            })
+                            .then(res => res.json())
+                            .then(data2 => {
+                                document.getElementById('dialogText').textContent = data2.text;
+                                document.getElementById('nextBtn').style.display = data2.show_next ? 'block' : 'none';
+                                document.getElementById('findPwdBtn').style.display = data2.show_findpwd ? 'block' : 'none';
+                                document.getElementById('feedBtn').style.display = data2.show_feed ? 'block' : 'none';
+                            });
+                        }, 2000);
+                    }
+                });
+            };
+            
+            // 处理登录表单提交
+            document.getElementById('loginForm').onsubmit = function(e) {
+                e.preventDefault();
+                // 获取用户输入的账号和密码
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                // 发送登录请求
+                fetch('/dialog', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password
+                    })
+                })
+                .then(res => res.json())
+                .then(updateDialog);
+            };
+
+            // 找回密码相关
+            document.getElementById('findPwdBtn').onclick = function() {
+                // 显示找回密码弹窗
+                document.getElementById('findPwdModal').style.display = 'block';
+            };
+            document.getElementById('findPwdSubmit').onclick = function() {
+                const key = document.getElementById('findPwdInput').value.trim();
+                fetch('/dialog', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action: 'findkey', key: key})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('findPwdModal').style.display = 'none';
+                    updateDialog(data);
+                });
+            };
+            document.getElementById('findPwdCancel').onclick = function() {
+                // 关闭找回密码弹窗
+                document.getElementById('findPwdModal').style.display = 'none';
+            };
+        }); 
+    </script>
+</body>
+</html>

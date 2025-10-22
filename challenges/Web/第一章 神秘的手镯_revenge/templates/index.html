@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>玄天手镯·万言启封咒</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='shouzhuo.css') }}">
+</head>
+<body>
+    <div class="altar">
+        <div class="jade-bracelet">
+            <div class="inscription">玄天至宝·封灵镯</div>
+            <div class="glow"></div>
+        </div>
+        
+        <div class="challenge">
+            <p class="hint">「以万言咒启封，禁取巧之道」</p>
+            <div class="input-area">
+                <textarea id="passwordInput" 
+                          placeholder="在此结印输入万言启封咒...">在此输入万言启封咒</textarea>
+                <div class="warning">粘贴禁止！请手动输入！</div>
+            </div>
+            <button id="unsealButton">启封手镯</button>
+            
+            <!-- 验证结果区域 -->
+            <div id="result"></div>
+        </div>
+        
+        <div class="lore">
+            <p>※ 上古秘闻：此乃K皇渡劫前所铸，需诚心者手动输入万言咒方能解封</p>
+            <p>※ 破妄提示：神念探查可窥天机</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='shouzhuo.js') }}"></script>
+</body>
+    <script>
+    // 启封按钮点击后重置 textarea 内容
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('unsealButton');
+        var textarea = document.getElementById('passwordInput');
+        btn.addEventListener('click', function() {
+            textarea.value = '';
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  final-challenge:
+    build: .
+    container_name: final-challenge
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web/uploads:/var/www/html/uploads
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+      - UPLOAD_PATH=/var/www/html/uploads
+      - FLAG=CTF{R4c3_C0nd1t10n_W1n}
+    restart: unless-stopped

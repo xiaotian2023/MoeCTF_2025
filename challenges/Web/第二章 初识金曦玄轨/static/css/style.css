@@ -1,0 +1,118 @@
+/* 基础设置 */
+body {
+    font-family: 'Ma Shan Zheng', cursive;
+    color: #e4d5a8;
+    overflow-x: hidden;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* 水墨背景 */
+.ink-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(ellipse at center, #0a2a38 0%, #1a1a1a 70%);
+}
+
+/* 古风卷轴容器 */
+.scroll-container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: 
+        linear-gradient(to bottom, 
+            rgba(245,233,201,0.2) 0%,
+            rgba(245,233,201,0.8) 20%,
+            rgba(245,233,201,1) 50%,
+            rgba(245,233,201,0.8) 80%,
+            rgba(245,233,201,0.2) 100%);
+    position: relative;
+    border-left: 15px solid #d4af37;
+    border-right: 15px solid #d4af37;
+    box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    padding: 40px 0;
+}
+
+.scroll-content {
+    padding: 0 40px;
+}
+
+h1 {
+    font-size: 2.8rem;
+    color: #d4af37;
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(212,175,55,0.5);
+}
+
+/* 符咒卡片 */
+.talisman-card {
+    padding: 25px;
+    margin: 25px 0;
+    background: rgba(26,26,26,0.3);
+    border: 1px solid #4fd1c5;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(79,209,197,0.2);
+}
+
+blockquote {
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #a8e4d0;
+    text-align: center;
+}
+
+.blur-text {
+    filter: blur(3px);
+    color: transparent;
+    text-shadow: 0 0 8px rgba(168,228,208,0.5);
+}
+
+/* 古籍效果 */
+.spell-code {
+    background: rgba(26,26,26,0.8);
+    padding: 25px;
+    margin: 30px 0;
+    position: relative;
+}
+
+.spell-header {
+    position: absolute;
+    top: -15px;
+    left: 20px;
+    background: #d4af37;
+    color: #1a1a1a;
+    padding: 5px 15px;
+    font-size: 1.2rem;
+}
+
+.obscured {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(26,26,26,0.8),
+        rgba(26,26,26,0.8) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    color: transparent;
+    text-shadow: 0 0 5px rgba(168,228,208,0.3);
+}
+
+/* 飞剑动画 */
+.sword {
+    position: fixed;
+    width: 80px;
+    height: 8px;
+    background: linear-gradient(90deg, #4fd1c5, #d4af37);
+    animation: flyingSword 15s linear infinite;
+    z-index: 5;
+    opacity: 0.8;
+}
+
+@keyframes flyingSword {
+    0% { transform: translateX(-100px) translateY(30vh) rotate(-30deg); }
+    100% { transform: translateX(100vw) translateY(70vh) rotate(10deg); }
+}

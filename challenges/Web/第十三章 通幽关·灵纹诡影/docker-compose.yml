@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  jade-challenge:
+    build: .
+    container_name: jade-challenge
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web/uploads:/var/www/html/uploads
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+      - FLAG=CTF{Up10ad_Ph0t0_Ev1L} # 实际部署时平台会自动注入真实FLAG
+    restart: unless-stopped
