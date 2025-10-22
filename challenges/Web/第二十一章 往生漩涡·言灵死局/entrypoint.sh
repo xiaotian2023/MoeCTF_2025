@@ -2,6 +2,6 @@
 
 echo "$FLAG" > /flag
 
-unset FlAG
+unset FLAG
 
 python /app/app.py
