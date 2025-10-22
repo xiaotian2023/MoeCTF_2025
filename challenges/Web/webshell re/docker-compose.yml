@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  webshell-challenge:
+    build: .
+    ports:
+      - "8080:80"  # 暴露端口
+    environment:
+      - FLAG=flag{this_is_your_ctf_flag_123}
+    restart: unless-stopped
